@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +22,8 @@ import userservice.Model.Estrategia;
  * @author Horacio
  */
 public class UserService {
+
+    private static Queue<Estrategia> colaEstrategias;
 
     private static void respaldo(String estrategia) throws IOException {
         Process p = Runtime.getRuntime().exec("cmd.exe");
@@ -35,12 +39,7 @@ public class UserService {
             p_stdin.write("exit;");
             p_stdin.newLine();
             p_stdin.flush();
-            p_stdin.write("\n");
-            p_stdin.newLine();
-            p_stdin.flush();
-            p_stdin.write("cd..");
-            p_stdin.newLine();
-            p_stdin.flush();
+            p_stdin.close();
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -58,6 +57,29 @@ public class UserService {
         ArrayList<Estrategia> estrategias;
         Calendar cA, cC;
         Estrategia estrategia;
+        colaEstrategias = new LinkedList();
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Estrategia estrategia;
+                while (true) {
+                    estrategia = colaEstrategias.poll();
+                    if (estrategia != null) {
+                        try {
+                            respaldo(estrategia.getSentencia());
+                        } catch (IOException ex) {
+                            Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    try {
+                        //Sleep de 5 segundos
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        })).start();
         while (true) {
             try {
                 estrategias = conexion.getEstrategias();
@@ -74,12 +96,10 @@ public class UserService {
                             && cA.get(Calendar.HOUR_OF_DAY) == cC.get(Calendar.HOUR_OF_DAY)
                             && cA.get(Calendar.MINUTE) == cC.get(Calendar.MINUTE)) {
                         conexion.setProximaEjecucion(estrategias.get(i));
-                        respaldo(estrategia.getSentencia());
+                        colaEstrategias.add(estrategia);
                     }
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
                 Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
@@ -88,7 +108,6 @@ public class UserService {
             } catch (InterruptedException ex) {
                 Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
             }
-            System.out.print("Hola\n");
         }
     }
 }

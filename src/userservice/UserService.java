@@ -1,6 +1,10 @@
 package userservice;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -17,7 +21,38 @@ import userservice.Model.Estrategia;
  */
 public class UserService {
 
-    public static void main(String[] args) throws ParseException, IOException {
+    private static void respaldo(String estrategia) throws IOException {
+        Process p = Runtime.getRuntime().exec("cmd.exe");
+        BufferedWriter p_stdin
+                = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+        try {
+            p_stdin.write("rman target/");
+            p_stdin.newLine();
+            p_stdin.flush();
+            p_stdin.write(estrategia);
+            p_stdin.newLine();
+            p_stdin.flush();
+            p_stdin.write("exit;");
+            p_stdin.newLine();
+            p_stdin.flush();
+            p_stdin.write("\n");
+            p_stdin.newLine();
+            p_stdin.flush();
+            p_stdin.write("cd..");
+            p_stdin.newLine();
+            p_stdin.flush();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = reader.readLine();
+        while (line != null) {
+            System.out.println(line);
+            line = reader.readLine();
+        }
+    }
+
+    public static void main(String[] args) throws ParseException {
         Conexion conexion = new Conexion();
         conexion.conectar();
         ArrayList<Estrategia> estrategias;
@@ -39,12 +74,12 @@ public class UserService {
                             && cA.get(Calendar.HOUR_OF_DAY) == cC.get(Calendar.HOUR_OF_DAY)
                             && cA.get(Calendar.MINUTE) == cC.get(Calendar.MINUTE)) {
                         conexion.setProximaEjecucion(estrategias.get(i));
-                        //Meter aqui el codigo para que el rman haga el respaldo
-                        //el codigo del comando lo tiene estrategia con getSentencia se saca
-                        // basicamente estrategia.getSentencia();
+                        respaldo(estrategia.getSentencia());
                     }
                 }
             } catch (SQLException ex) {
+                Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
                 Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
@@ -53,6 +88,7 @@ public class UserService {
             } catch (InterruptedException ex) {
                 Logger.getLogger(UserService.class.getName()).log(Level.SEVERE, null, ex);
             }
+            System.out.print("Hola\n");
         }
     }
 }

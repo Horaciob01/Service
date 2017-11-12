@@ -74,11 +74,7 @@ public class Conexion {
         Timestamp proxima_ejecucion;
         try {
             stm = conexion.createStatement();
-<<<<<<< HEAD
             rs = stm.executeQuery("select * from estrategias");
-=======
-            rs = stm.executeQuery("select * from system.estrategias");
->>>>>>> 414576dfa3d631007ef577fea1ee8ba8d593bf8d
             while (rs.next()) {
                 nombre = rs.getString("nombre");
                 sentencia = rs.getString("sentencia");
@@ -140,12 +136,7 @@ public class Conexion {
             }
         }
         estrategia.setProxima_ejecucion(proxima_ejecucion);
-<<<<<<< HEAD
         String sql1 = "UPDATE ESTRATEGIAS "
-=======
-        String sql
-                = "UPDATE system.ESTRATEGIAS "
->>>>>>> 414576dfa3d631007ef577fea1ee8ba8d593bf8d
                 + "SET proxima_ejecucion = ?"
                 + " WHERE nombre = ?";
         String sql2 = "UPDATE cental.ESTRATEGIAS@central"

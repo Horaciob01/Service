@@ -21,8 +21,8 @@ public class Conexion {
     //Descargar ojdbc6.jar e incluirlo en la libreria
     private Connection conexion;
     static String url = "jdbc:oracle:thin:@localhost:1521/XE";
-    static String user = "SYSTEM";
-    static String password = "root";
+    static String user = "sede";
+    static String password = "sede";
 
     /*Metodos*/
     public String getUser() {
@@ -74,7 +74,7 @@ public class Conexion {
         Timestamp proxima_ejecucion;
         try {
             stm = conexion.createStatement();
-            rs = stm.executeQuery("select * from sys.estrategias");
+            rs = stm.executeQuery("select * from estrategias");
             while (rs.next()) {
                 nombre = rs.getString("nombre");
                 sentencia = rs.getString("sentencia");
@@ -136,19 +136,58 @@ public class Conexion {
             }
         }
         estrategia.setProxima_ejecucion(proxima_ejecucion);
-        String sql
-                = "UPDATE SYS.ESTRATEGIAS "
+        String sql1 = "UPDATE ESTRATEGIAS "
                 + "SET proxima_ejecucion = ?"
                 + " WHERE nombre = ?";
-        PreparedStatement pstmt = conexion.prepareStatement(sql);
-
-        pstmt.setTimestamp(
-                1, estrategia.getProxima_ejecucion());
-        pstmt.setString(
-                2, estrategia.getNombre());
+        String sql2 = "UPDATE cental.ESTRATEGIAS@central"
+                + " SET proxima_ejecucion = ?,"
+                + " SET inicio_ult_ejecu = ?"
+                + " WHERE nombre = ?";
+        PreparedStatement pstmt1 = conexion.prepareStatement(sql1);
+        PreparedStatement pstmt2 = conexion.prepareStatement(sql2);
+        pstmt1.setTimestamp(1, estrategia.getProxima_ejecucion());
+        pstmt1.setString(2, estrategia.getNombre());
+        pstmt2.setTimestamp(1, estrategia.getProxima_ejecucion());
+        pstmt2.setTimestamp(2, new Timestamp((new Date()).getTime()));
+        pstmt2.setString(3, estrategia.getNombre());
         try {
-            pstmt.executeUpdate();
-            pstmt.close();
+            pstmt1.executeUpdate();
+            pstmt1.close();
+            pstmt2.executeUpdate();
+            pstmt2.close();
+            //conexion.commit();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void setEvidencia(String evidencia, Date inicio, Estrategia estrategia) throws SQLException {
+        Date termino = new Date();
+        String sql1 = "insert into evidencias values(?,?,?,?)";
+        String sql2 = "insert into central.evidencias@central values(?,?,?,?)";
+        String sql3 = "UPDATE cental.ESTRATEGIAS@central"
+                + " SET fin_ult_ejecu = ?,"
+                + " WHERE nombre = ?";
+        PreparedStatement pstmt1 = conexion.prepareStatement(sql1);
+        PreparedStatement pstmt2 = conexion.prepareStatement(sql2);
+        PreparedStatement pstmt3 = conexion.prepareStatement(sql3);
+        pstmt1.setString(1, estrategia.getNombre());
+        pstmt1.setTimestamp(2, new Timestamp(inicio.getTime()));
+        pstmt1.setTimestamp(3, new Timestamp(termino.getTime()));
+        pstmt1.setString(4, evidencia);
+        pstmt2.setString(1, estrategia.getNombre());
+        pstmt2.setTimestamp(2, new Timestamp(inicio.getTime()));
+        pstmt2.setTimestamp(3, new Timestamp(termino.getTime()));
+        pstmt2.setString(4, evidencia);
+        pstmt3.setTimestamp(1, new Timestamp(termino.getTime()));
+        pstmt3.setString(3, estrategia.getNombre());
+        try {
+            pstmt1.executeUpdate();
+            pstmt1.close();
+            pstmt2.executeUpdate();
+            pstmt2.close();
+            pstmt3.executeUpdate();
+            pstmt3.close();
             //conexion.commit();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());

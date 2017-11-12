@@ -15,23 +15,18 @@ public class Estrategia {
     int dias;
     int hora_inicio;
     int hora_final;
-
-    public int getHora_inicio() {
-        return hora_inicio;
-    }
-
-    public void setHora_inicio(int hora_inicio) {
-        this.hora_inicio = hora_inicio;
-    }
-
-    public int getHora_final() {
-        return hora_final;
-    }
-
-    public void setHora_final(int hora_final) {
-        this.hora_final = hora_final;
-    }
     Timestamp proxima_ejecucion;
+
+    public Estrategia(String nombre, String sentencia, Boolean estado, int frecuencia, int dias, int hora_inicio, int hora_final, Timestamp proxima_ejecucion) {
+        this.nombre = nombre;
+        this.sentencia = sentencia;
+        this.estado = estado;
+        this.frecuencia = frecuencia;
+        this.dias = dias;
+        this.hora_inicio = hora_inicio;
+        this.hora_final = hora_final;
+        this.proxima_ejecucion = proxima_ejecucion;
+    }
 
     public String getNombre() {
         return nombre;
@@ -73,6 +68,22 @@ public class Estrategia {
         this.dias = dias;
     }
 
+    public int getHora_inicio() {
+        return hora_inicio;
+    }
+
+    public void setHora_inicio(int hora_inicio) {
+        this.hora_inicio = hora_inicio;
+    }
+
+    public int getHora_final() {
+        return hora_final;
+    }
+
+    public void setHora_final(int hora_final) {
+        this.hora_final = hora_final;
+    }
+
     public Timestamp getProxima_ejecucion() {
         return proxima_ejecucion;
     }
@@ -80,17 +91,4 @@ public class Estrategia {
     public void setProxima_ejecucion(Timestamp proxima_ejecucion) {
         this.proxima_ejecucion = proxima_ejecucion;
     }
-
-    public Estrategia(String nombre, String sentencia, Boolean estado, int frecuencia, int dias, int hora_inicio, int hora_final, Timestamp proxima_ejecucion) {
-        this.nombre = nombre;
-        this.sentencia = sentencia;
-        this.estado = estado;
-        this.frecuencia = frecuencia;
-        this.dias = dias;
-        this.hora_inicio = hora_inicio;
-        this.hora_final = hora_final;
-        this.proxima_ejecucion = proxima_ejecucion;
-    }
-
-    
 }

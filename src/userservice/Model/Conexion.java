@@ -74,7 +74,7 @@ public class Conexion {
         Timestamp proxima_ejecucion;
         try {
             stm = conexion.createStatement();
-            rs = stm.executeQuery("select * from sys.estrategias");
+            rs = stm.executeQuery("select * from system.estrategias");
             while (rs.next()) {
                 nombre = rs.getString("nombre");
                 sentencia = rs.getString("sentencia");
@@ -137,7 +137,7 @@ public class Conexion {
         }
         estrategia.setProxima_ejecucion(proxima_ejecucion);
         String sql
-                = "UPDATE SYS.ESTRATEGIAS "
+                = "UPDATE system.ESTRATEGIAS "
                 + "SET proxima_ejecucion = ?"
                 + " WHERE nombre = ?";
         PreparedStatement pstmt = conexion.prepareStatement(sql);
